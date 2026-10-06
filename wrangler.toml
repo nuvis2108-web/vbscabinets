@@ -1,0 +1,43 @@
+# Cloudflare Pages configuration for the site and its Functions (functions/).
+# Once deployed, this file is the source of truth for bindings — the dashboard's binding settings become read-only.
+# Secrets are NOT stored here: set TURNSTILE_SECRET_KEY and PHOTO_LINK_SECRET in the Pages project settings
+# (and in .dev.vars for local development).
+
+name = "vbscabinets"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-01"
+
+# Top level = local development (`npm run dev:functions`). R2 is simulated locally.
+[vars]
+QUOTE_ENV = "local"
+
+[[r2_buckets]]
+binding = "QUOTE_UPLOADS"
+bucket_name = "vbs-quote-uploads-preview"
+
+[[services]]
+binding = "QUOTE_MAILER"
+service = "vbs-quote-mailer"
+
+# Preview deployments (any branch other than production): separate bucket, emails marked [PREVIEW].
+[env.preview.vars]
+QUOTE_ENV = "preview"
+
+[[env.preview.r2_buckets]]
+binding = "QUOTE_UPLOADS"
+bucket_name = "vbs-quote-uploads-preview"
+
+[[env.preview.services]]
+binding = "QUOTE_MAILER"
+service = "vbs-quote-mailer"
+
+[env.production.vars]
+QUOTE_ENV = "production"
+
+[[env.production.r2_buckets]]
+binding = "QUOTE_UPLOADS"
+bucket_name = "vbs-quote-uploads"
+
+[[env.production.services]]
+binding = "QUOTE_MAILER"
+service = "vbs-quote-mailer"

@@ -1,0 +1,21 @@
+---
+// Three short facts that sit directly under the hero, on the same container and rules as the rest of the page.
+const points = [
+  { title: 'Made to fit', text: 'Designed around your room, your storage and the finish you want.' },
+  { title: 'Built by VBS', text: 'Every project shown on this page was built and installed by our team.' },
+  { title: 'Quotes from photos', text: 'Send a few photos and rough dimensions to get a free quote.' },
+];
+---
+
+<section aria-label="Why VBS" class="container-site">
+  <ul class="grid border-t border-line md:grid-cols-3">
+    {
+      points.map((point) => (
+        <li class="border-b border-line py-6 last:border-b-0 md:border-b-0 md:border-l md:py-8 md:pl-8 md:first:border-l-0 md:first:pl-0">
+          <h2 class="text-h4">{point.title}</h2>
+          <p class="mt-2 max-w-[36ch] text-muted">{point.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>

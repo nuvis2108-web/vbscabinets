@@ -1,0 +1,80 @@
+---
+// TODO(owner): review this wording before launch. It describes how the quote form actually works
+// (see functions/api/quote.ts) but has not been checked by a lawyer.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/data/site';
+
+const sections = [
+  {
+    title: 'What we collect',
+    body: [
+      'When you request a quote, we collect your name, phone number, email address, city, project type, rough dimensions, project description and any photos you choose to upload.',
+      'When you use the form, Cloudflare processes your IP address and basic browser information to run the spam check and keep the site secure.',
+    ],
+  },
+  {
+    title: 'Why we collect it',
+    body: [
+      'We use your details and photos only to review your project, contact you about it and prepare your quote. We don’t sell your information or use it for advertising.',
+    ],
+  },
+  {
+    title: 'How your photos are handled',
+    body: [
+      'Before upload, your browser resizes each photo and removes hidden metadata, including location data. Photos that can’t be converted safely are not uploaded.',
+      'Photos are stored privately. They are never public on this website: only VBS can view them, through private links that expire after 30 days.',
+    ],
+  },
+  {
+    title: 'Who processes it for us',
+    body: [
+      'Cloudflare hosts this website, runs the spam check, stores uploaded photos and delivers quote requests to us by email. We receive quote requests in our Google Gmail inbox.',
+      'These providers may store or process information outside Canada, including in the United States.',
+    ],
+  },
+  {
+    title: 'How long we keep it',
+    body: [
+      'Uploaded photos and the stored copy of your request are deleted automatically 180 days after you send it.',
+      'Quote request emails are kept only as long as we need them for your project and our business records.',
+    ],
+  },
+  {
+    title: 'Cookies and tracking',
+    body: ['This website doesn’t use advertising or analytics cookies. The spam check is used only to block automated submissions.'],
+  },
+  {
+    title: 'Your choices',
+    body: [
+      `You can ask to see, correct or delete the information you sent us. Email ${site.email.display} or call ${site.phone.display}.`,
+    ],
+  },
+];
+---
+
+<BaseLayout title="Privacy Policy | VBS Closets & Cabinets" description="How VBS Closets & Cabinets handles the details and photos you send with a quote request.">
+  <section class="section pt-10 md:pt-16" aria-labelledby="privacy-title">
+    <div class="container-site max-w-3xl">
+      <p class="eyebrow">Privacy</p>
+      <h1 id="privacy-title" class="text-display mt-4">Privacy Policy</h1>
+      <p class="text-lead mt-6 text-muted">
+        {site.name} is operated by {site.legalName}, based in {site.baseCity}, Ontario. This page explains how we
+        handle the information you send us.
+      </p>
+      <p class="mt-4 text-sm text-muted">Last updated: October 2026</p>
+
+      <div class="mt-12 flex flex-col gap-12">
+        {
+          sections.map((section) => (
+            <div>
+              <h2 class="text-h3">{section.title}</h2>
+              {section.body.map((paragraph) => (
+                <p class="mt-4 max-w-[65ch]">{paragraph}</p>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

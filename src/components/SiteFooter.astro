@@ -1,0 +1,57 @@
+---
+import Logo from '@/components/Logo.astro';
+import { nav, site } from '@/data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line bg-paper">
+  <div class="container-site grid gap-12 py-16 md:grid-cols-12">
+    <div class="md:col-span-5">
+      <Logo height={48} loading="lazy" class="h-12 w-auto" />
+      <p class="mt-6 max-w-[40ch] text-sm text-muted">
+        Custom cabinetry, closets, media walls, built-ins and woodworking for homes in Hamilton and across the GTA.
+      </p>
+    </div>
+
+    <nav aria-label="Footer" class="md:col-span-3">
+      <h2 class="eyebrow">Explore</h2>
+      <ul class="mt-2 flex flex-col text-sm">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} class="inline-flex min-h-11 items-center hover:text-accent">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="md:col-span-4">
+      <h2 class="eyebrow">Contact</h2>
+      <ul class="mt-2 flex flex-col text-sm">
+        <li><a href={site.phone.href} class="inline-flex min-h-11 items-center hover:text-accent">{site.phone.display}</a></li>
+        <li><a href={site.email.href} class="inline-flex min-h-11 items-center break-all hover:text-accent">{site.email.display}</a></li>
+        <li>
+          <a href={site.instagram.url} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center hover:text-accent">
+            Instagram {site.instagram.handle}
+          </a>
+        </li>
+      </ul>
+      <p class="mt-4 text-sm text-muted">Serving {site.serviceAreaText}.</p>
+    </div>
+  </div>
+
+  <div class="border-t border-line">
+    <div class="container-site flex flex-col gap-2 py-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>&copy; {year} {site.name}</p>
+      <p>
+        <a href="/privacy" class="inline-flex min-h-11 items-center underline hover:text-accent">Privacy policy</a>
+        <span aria-hidden="true" class="mx-2">·</span>
+        Operated by {site.legalName}
+      </p>
+    </div>
+  </div>
+</footer>

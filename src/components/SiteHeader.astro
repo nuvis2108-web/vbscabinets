@@ -1,0 +1,113 @@
+---
+import Logo from '@/components/Logo.astro';
+import Icon from '@/components/Icon.astro';
+import { nav, site } from '@/data/site';
+---
+
+<header class="sticky top-0 z-40 border-b border-line bg-paper">
+  <div class="container-site flex h-18 items-center justify-between gap-6 lg:h-20">
+    <a href="/" class="inline-flex min-h-11 shrink-0 items-center" aria-label={`${site.name} — home`}>
+      <Logo class="h-10 w-auto lg:h-12" />
+    </a>
+
+    <nav aria-label="Main" class="hidden lg:block">
+      <ul class="flex items-center gap-8 text-sm font-medium">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} class="inline-flex min-h-11 items-center underline-offset-8 transition-colors hover:text-accent hover:underline">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <a href={site.phone.href} class="hidden min-h-11 items-center text-sm font-semibold xl:inline-flex">{site.phone.display}</a>
+      <a href={site.quote.href} class="btn btn-dark hidden sm:inline-flex">Request a Quote</a>
+      <button
+        type="button"
+        class="-mr-2 inline-flex min-h-12 items-center gap-2 rounded px-2 text-sm font-semibold lg:hidden"
+        aria-haspopup="dialog"
+        aria-controls="site-menu"
+        aria-expanded="false"
+        data-menu-open
+      >
+        <Icon name="menu" />
+        Menu
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog
+  id="site-menu"
+  aria-label="Site menu"
+  class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-none bg-paper p-0 text-ink transition-transform duration-300 ease-out backdrop:bg-ink/50 sm:max-w-sm starting:open:translate-x-full"
+>
+  <div class="flex h-full flex-col">
+    <div class="flex h-18 items-center justify-between border-b border-line px-6">
+      <span class="eyebrow">Menu</span>
+      <button
+        type="button"
+        class="-mr-2 inline-flex size-12 items-center justify-center rounded"
+        aria-label="Close menu"
+        data-menu-close
+      >
+        <Icon name="close" />
+      </button>
+    </div>
+
+    <nav aria-label="Mobile" class="flex-1 overflow-y-auto px-6 py-8">
+      <ul class="flex flex-col">
+        {
+          nav.map((item) => (
+            <li class="border-b border-line">
+              <a href={item.href} class="flex min-h-14 items-center text-h4" data-menu-link>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex flex-col gap-4 border-t border-line px-6 pt-6 pb-[max(24px,env(safe-area-inset-bottom))]">
+      <a href={site.quote.href} class="btn btn-primary w-full" data-menu-link>Request a Quote</a>
+      <a href={site.phone.href} class="btn btn-outline w-full">
+        <Icon name="phone" size={20} />
+        Call {site.phone.display}
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const menu = document.getElementById('site-menu') as HTMLDialogElement | null;
+  const openButton = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+
+  if (menu && openButton) {
+    const close = () => menu.close();
+
+    openButton.addEventListener('click', () => {
+      menu.showModal();
+      openButton.setAttribute('aria-expanded', 'true');
+    });
+
+    menu.addEventListener('close', () => openButton.setAttribute('aria-expanded', 'false'));
+    menu.querySelector('[data-menu-close]')?.addEventListener('click', close);
+    menu.querySelectorAll('[data-menu-link]').forEach((link) => link.addEventListener('click', close));
+
+    // Clicking the backdrop (outside the panel) closes the menu.
+    menu.addEventListener('click', (event) => {
+      if (event.target === menu) close();
+    });
+
+    // The menu is mobile-only; close it if the viewport grows to desktop.
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+      if (event.matches && menu.open) close();
+    });
+  }
+</script>

@@ -1,0 +1,296 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Picture, getImage } from 'astro:assets';
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+
+import kitchenFront from '@/assets/images/two-tone-custom-kitchen-alt.jpg';
+import kitchenAngle from '@/assets/images/two-tone-custom-kitchen.jpg';
+import fireplaceFront from '@/assets/images/arched-fireplace-built-in-alt.jpg';
+import fireplaceWide from '@/assets/images/arched-fireplace-built-in.jpg';
+import oakDresser from '@/assets/images/custom-oak-dresser.jpg';
+import oakNightstands from '@/assets/images/oak-nightstands.jpg';
+
+interface Photo {
+  src: ImageMetadata;
+  alt: string;
+}
+
+interface Project {
+  id: string;
+  kicker: string;
+  title: string;
+  description: string;
+  photos: Photo[];
+  /** Columns spanned at desktop widths (out of 12). */
+  span: 5 | 7;
+  /** Aspect ratio, height and object-position for the cover photo — chosen per photo so the build reads clearly. */
+  crop: string;
+}
+
+const projects: Project[] = [
+  {
+    id: 'two-tone-kitchen',
+    kicker: 'Kitchen cabinetry',
+    title: 'Two-Tone Custom Kitchen',
+    description: 'White shaker uppers, navy lowers, a slatted-wood island with seating and a wood-trimmed range hood.',
+    span: 7,
+    crop: 'aspect-4/3 lg:aspect-auto lg:h-96 object-[50%_60%]',
+    photos: [
+      {
+        src: kitchenFront,
+        alt: 'Two-tone kitchen with white shaker upper cabinets, navy lower cabinets, quartz counters and a navy island with vertical wood slats and three stools',
+      },
+      {
+        src: kitchenAngle,
+        alt: 'Angled view of the two-tone kitchen showing the island seating, full-height navy pantry cabinets and brass hardware',
+      },
+    ],
+  },
+  {
+    id: 'oak-furniture',
+    kicker: 'Custom woodworking',
+    title: 'Solid Oak Bedroom Furniture',
+    description: 'A made-to-order oak dresser and matching nightstands with angled legs and black bar pulls.',
+    span: 5,
+    // Natural 6:5 frame keeps the top drawers and the angled legs in view.
+    crop: 'aspect-6/5 lg:aspect-auto lg:h-96 object-[50%_70%]',
+    photos: [
+      {
+        src: oakDresser,
+        alt: 'Custom white-oak eight-drawer dresser with mid-century angled legs and black bar pulls',
+      },
+      {
+        src: oakNightstands,
+        alt: 'Pair of matching white-oak nightstands with an open shelf, two drawers and angled legs',
+      },
+    ],
+  },
+  {
+    id: 'arched-fireplace',
+    kicker: 'Fireplace built-in',
+    title: 'Arched Fireplace Built-In',
+    description: 'Arched niches with wood floating shelves and flat-panel base cabinets on either side of a stone fireplace.',
+    span: 7,
+    // Wide frame anchored low so the cabinetry, not the ceiling light, fills the photo.
+    crop: 'aspect-16/10 lg:aspect-auto lg:h-104 object-[50%_85%]',
+    photos: [
+      {
+        src: fireplaceFront,
+        alt: 'White arched built-ins with wood floating shelves and flat-panel base cabinets flanking a stacked-stone fireplace with a wood mantel',
+      },
+      {
+        src: fireplaceWide,
+        alt: 'Wider view of the arched fireplace built-ins with matching storage cabinets on both sides',
+      },
+    ],
+  },
+];
+
+// Larger WebP versions for the photo viewer — only downloaded when the viewer opens.
+const viewerData = Object.fromEntries(
+  await Promise.all(
+    projects.map(async (project) => [
+      project.id,
+      {
+        title: project.title,
+        photos: await Promise.all(
+          project.photos.map(async (photo) => {
+            const image = await getImage({ src: photo.src, width: Math.min(1600, photo.src.width), format: 'webp' });
+            return {
+              src: image.src,
+              width: image.attributes.width,
+              height: image.attributes.height,
+              alt: photo.alt,
+            };
+          }),
+        ),
+      },
+    ]),
+  ),
+);
+---
+
+<section id="projects" class="section" aria-labelledby="projects-title">
+  <div class="container-site">
+    <div class="max-w-2xl">
+      <p class="eyebrow">Selected projects</p>
+      <h2 id="projects-title" class="text-h2 mt-4">Built for real homes.</h2>
+      <p class="text-lead mt-4 text-muted">
+        Recent cabinetry, built-ins and woodwork by VBS. Select a project to see more photos.
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-x-6 gap-y-12 lg:grid-cols-12">
+      {
+        projects.map((project) => {
+          const [cover] = project.photos;
+          return (
+            <article class={project.span === 7 ? 'lg:col-span-7' : 'lg:col-span-5'}>
+              <button
+                type="button"
+                class="group relative block w-full cursor-zoom-in overflow-hidden rounded-md bg-line"
+                data-viewer-open={project.id}
+                aria-haspopup="dialog"
+                aria-label={`View ${project.photos.length} photos of the ${project.title}`}
+              >
+                <Picture
+                  src={cover.src}
+                  formats={['avif', 'webp']}
+                  widths={[480, 720, 960, 1280]}
+                  sizes={
+                    project.span === 7
+                      ? '(min-width: 1180px) 650px, (min-width: 1024px) 56vw, 100vw'
+                      : '(min-width: 1180px) 460px, (min-width: 1024px) 40vw, 100vw'
+                  }
+                  alt={cover.alt}
+                  loading="lazy"
+                  class:list={[
+                    'w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]',
+                    project.crop,
+                  ]}
+                />
+                <span class="absolute right-4 bottom-4 inline-flex items-center gap-2 rounded-sm bg-paper px-2 py-1 text-xs font-semibold text-ink">
+                  <Icon name="expand" size={16} />
+                  {project.photos.length} photos
+                </span>
+              </button>
+              <p class="eyebrow mt-6">{project.kicker}</p>
+              <h3 class="text-h3 mt-2">{project.title}</h3>
+              <p class="mt-2 max-w-[60ch] text-muted">{project.description}</p>
+            </article>
+          );
+        })
+      }
+
+      <div
+        class="flex flex-col items-start justify-between gap-8 rounded-md border border-line bg-card p-6 sm:p-8 lg:col-span-5 lg:h-104"
+        data-hides-action-bar
+      >
+        <div>
+          <p class="text-h3 max-w-[20ch]">Planning something similar for your home?</p>
+          <p class="mt-4 max-w-[40ch] text-muted">
+            Send a few photos of the space and rough dimensions, and we'll come back with a quote.
+          </p>
+        </div>
+        <a href={site.quote.href} class="btn btn-primary">Request a Quote</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<dialog
+  id="project-viewer"
+  aria-labelledby="project-viewer-title"
+  class="m-0 h-dvh max-h-none w-screen max-w-none bg-ink/95 p-0 text-white backdrop:bg-transparent"
+>
+  <div class="flex h-full flex-col">
+    <div class="flex items-center justify-between gap-4 px-4 py-2 sm:px-6">
+      <p id="project-viewer-title" class="text-h4" data-viewer-title></p>
+      <button
+        type="button"
+        class="inline-flex size-12 items-center justify-center rounded"
+        aria-label="Close photo viewer"
+        data-viewer-close
+      >
+        <Icon name="close" />
+      </button>
+    </div>
+
+    <figure class="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-4 pb-4 sm:px-16">
+      <img data-viewer-image alt="" class="max-h-full min-h-0 w-auto max-w-full object-contain" decoding="async" />
+      <figcaption class="max-w-[70ch] text-center text-sm text-white/80" data-viewer-caption></figcaption>
+    </figure>
+
+    <div class="flex items-center justify-center gap-4 px-4 pt-2 pb-[max(16px,env(safe-area-inset-bottom))]" data-viewer-nav>
+      <button
+        type="button"
+        class="inline-flex size-12 items-center justify-center rounded border border-white/30 hover:border-white"
+        aria-label="Previous photo"
+        data-viewer-prev
+      >
+        <Icon name="chevron-left" />
+      </button>
+      <p class="min-w-16 text-center text-sm tabular-nums" aria-live="polite" data-viewer-count></p>
+      <button
+        type="button"
+        class="inline-flex size-12 items-center justify-center rounded border border-white/30 hover:border-white"
+        aria-label="Next photo"
+        data-viewer-next
+      >
+        <Icon name="chevron-right" />
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<script type="application/json" id="project-viewer-data" set:html={JSON.stringify(viewerData)} />
+
+<script>
+  type ViewerPhoto = { src: string; width: number; height: number; alt: string };
+  type ViewerProject = { title: string; photos: ViewerPhoto[] };
+
+  const viewer = document.getElementById('project-viewer') as HTMLDialogElement | null;
+  const dataEl = document.getElementById('project-viewer-data');
+
+  if (viewer && dataEl) {
+    const projects: Record<string, ViewerProject> = JSON.parse(dataEl.textContent ?? '{}');
+    const title = viewer.querySelector<HTMLElement>('[data-viewer-title]')!;
+    const image = viewer.querySelector<HTMLImageElement>('[data-viewer-image]')!;
+    const caption = viewer.querySelector<HTMLElement>('[data-viewer-caption]')!;
+    const count = viewer.querySelector<HTMLElement>('[data-viewer-count]')!;
+    const nav = viewer.querySelector<HTMLElement>('[data-viewer-nav]')!;
+
+    let current: ViewerProject | undefined;
+    let index = 0;
+
+    const render = () => {
+      if (!current) return;
+      const photo = current.photos[index];
+      image.src = photo.src;
+      image.width = photo.width;
+      image.height = photo.height;
+      image.alt = photo.alt;
+      caption.textContent = photo.alt;
+      count.textContent = `${index + 1} / ${current.photos.length}`;
+    };
+
+    const step = (delta: number) => {
+      if (!current) return;
+      index = (index + delta + current.photos.length) % current.photos.length;
+      render();
+    };
+
+    document.querySelectorAll<HTMLButtonElement>('[data-viewer-open]').forEach((button) => {
+      button.addEventListener('click', () => {
+        current = projects[button.dataset.viewerOpen ?? ''];
+        if (!current) return;
+        index = 0;
+        title.textContent = current.title;
+        nav.hidden = current.photos.length < 2;
+        render();
+        viewer.showModal();
+      });
+    });
+
+    viewer.querySelector('[data-viewer-close]')?.addEventListener('click', () => viewer.close());
+    viewer.querySelector('[data-viewer-prev]')?.addEventListener('click', () => step(-1));
+    viewer.querySelector('[data-viewer-next]')?.addEventListener('click', () => step(1));
+
+    viewer.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') step(-1);
+      if (event.key === 'ArrowRight') step(1);
+    });
+
+    // Click on the dark area around the photo closes the viewer.
+    viewer.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target === viewer || target.tagName === 'FIGURE') viewer.close();
+    });
+
+    viewer.addEventListener('close', () => {
+      image.removeAttribute('src');
+      current = undefined;
+    });
+  }
+</script>

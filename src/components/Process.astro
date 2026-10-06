@@ -1,0 +1,53 @@
+---
+const steps = [
+  { title: 'Share the space', text: 'Send current photos, rough measurements and any inspiration images.' },
+  { title: 'Define the build', text: 'We work through the layout, materials, finishes and practical details with you.' },
+  { title: 'Quote & schedule', text: 'You receive a clear project quote and an estimated timeline.' },
+  { title: 'Build & install', text: 'Your project is built and installed for the agreed space and scope.' },
+];
+
+const toSend = [
+  'Your city',
+  'Rough dimensions of the space',
+  'A few photos of the space as it is now',
+  'Inspiration images, if you have them',
+];
+---
+
+<section id="process" class="section bg-white" aria-labelledby="process-title">
+  <div class="container-site">
+    <div class="max-w-2xl">
+      <p class="eyebrow">How it works</p>
+      <h2 id="process-title" class="text-h2 mt-4">From an idea to an installed build.</h2>
+      <p class="text-lead mt-4 text-muted">
+        Starting is simple. Tell us about the space and we'll help turn it into a practical build plan.
+      </p>
+    </div>
+
+    <ol class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+      {
+        steps.map((step, i) => (
+          <li class="border-t-2 border-ink pt-6">
+            <span class="text-xs font-extrabold tracking-[0.18em] text-accent uppercase">Step {String(i + 1).padStart(2, '0')}</span>
+            <h3 class="text-h4 mt-2">{step.title}</h3>
+            <p class="mt-2 text-muted">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="mt-16 grid gap-6 rounded-md border border-line bg-paper p-6 sm:p-8 lg:grid-cols-12 lg:items-center">
+      <h3 class="text-h4 lg:col-span-4">What to send for a faster quote</h3>
+      <ul class="grid gap-2 sm:grid-cols-2 lg:col-span-8">
+        {
+          toSend.map((item) => (
+            <li class="flex gap-2">
+              <span class="mt-2 size-1.5 shrink-0 rounded-full bg-warm" aria-hidden="true" />
+              <span>{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

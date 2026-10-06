@@ -1,0 +1,40 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/data/site';
+---
+
+<BaseLayout title="Request received | VBS Closets & Cabinets" noindex actionBar={false}>
+  <section class="section" aria-labelledby="thanks-title">
+    <div class="container-site max-w-3xl">
+      <p class="eyebrow">Request received</p>
+      <h1 id="thanks-title" class="text-display mt-4">Thank you. Your request is in.</h1>
+      <p class="text-lead mt-6 max-w-[52ch] text-muted">
+        We'll review your details and photos, then get in touch by phone or email to talk through your project.
+      </p>
+
+      <p class="mt-8 hidden rounded-md border border-line bg-card p-6" data-reference-box>
+        Your reference: <strong class="font-semibold tracking-wide" data-reference></strong><br />
+        <span class="text-sm text-muted">Mention it if you call us about this request.</span>
+      </p>
+
+      <p class="mt-8">
+        Questions in the meantime? Call <a href={site.phone.href} class="font-semibold underline">{site.phone.display}</a>{' '}
+        or message us on <a href={site.whatsapp} target="_blank" rel="noopener" class="font-semibold underline">WhatsApp</a>.
+      </p>
+
+      <div class="mt-12 flex flex-col gap-4 sm:flex-row">
+        <a href="/#projects" class="btn btn-outline">See more of our work</a>
+        <a href="/" class="btn btn-outline">Back to home</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Show the reference from ?ref= only if it has the exact format the server issues.
+  const reference = new URLSearchParams(window.location.search).get('ref') ?? '';
+  if (/^VBS-\d{4}-[A-Z2-9]{6}$/.test(reference)) {
+    document.querySelector('[data-reference]')!.textContent = reference;
+    document.querySelector('[data-reference-box]')!.classList.remove('hidden');
+  }
+</script>

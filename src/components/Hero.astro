@@ -1,0 +1,38 @@
+---
+import { Picture } from 'astro:assets';
+import heroImage from '@/assets/images/hero-black-media-wall.jpg';
+import { site } from '@/data/site';
+---
+
+<section class="pt-10 pb-12 md:pt-16 lg:pt-20 lg:pb-16" aria-labelledby="hero-title">
+  <div class="container-site grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
+    <div class="lg:col-span-6">
+      <p class="eyebrow">Custom millwork · {site.baseCity}</p>
+      <h1 id="hero-title" class="text-display mt-4">Cabinetry and built-ins, made to fit your room.</h1>
+      <p class="text-lead mt-6 max-w-[46ch] text-muted lg:mt-8">
+        Kitchens, closets, media walls and fireplace built-ins — planned with you, then built and installed by VBS
+        for homes across {site.baseCity} and the GTA.
+      </p>
+      <div class="mt-8 lg:mt-10 flex flex-col gap-4 sm:flex-row" data-hides-action-bar>
+        <a href={site.quote.href} class="btn btn-primary">Request a Free Quote</a>
+        <a href="/#projects" class="btn btn-outline">View our work</a>
+      </div>
+    </div>
+
+    <figure class="lg:col-span-6">
+      <div class="overflow-hidden rounded-md bg-ink shadow-frame">
+        <Picture
+          src={heroImage}
+          formats={['avif', 'webp']}
+          widths={[480, 720, 960, 1280, 1600]}
+          sizes="(min-width: 1180px) 560px, (min-width: 1024px) 48vw, 100vw"
+          alt="Black custom media wall with a fluted centre panel, arched shelving niches with integrated lighting, white-oak shelves and shaker lower cabinets"
+          loading="eager"
+          fetchpriority="high"
+          class="aspect-4/3 w-full object-cover"
+        />
+      </div>
+      <figcaption class="mt-4 text-sm text-muted">VBS project · Custom media wall</figcaption>
+    </figure>
+  </div>
+</section>

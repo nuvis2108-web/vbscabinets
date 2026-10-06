@@ -1,11 +1,20 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import TrustStrip from '@/components/TrustStrip.astro';
+import FeaturedProjects from '@/components/FeaturedProjects.astro';
+import Services from '@/components/Services.astro';
+import Process from '@/components/Process.astro';
+import ServiceArea from '@/components/ServiceArea.astro';
+import QuoteCta from '@/components/QuoteCta.astro';
 ---
 
-<BaseLayout title="VBS Closets & Cabinets — redesign in progress">
-  <main class="mx-auto max-w-3xl px-6 py-24">
-    <p class="text-xs font-extrabold uppercase tracking-widest text-warm">Astro redesign scaffold</p>
-    <h1 class="mt-3 text-4xl font-bold tracking-tight">VBS Closets &amp; Cabinets</h1>
-    <p class="mt-4 text-muted">Placeholder page. The production site is unchanged on <code>main</code>.</p>
-  </main>
+<BaseLayout title="VBS Closets & Cabinets | Custom Cabinetry, Closets, Media Walls & Built-Ins">
+  <Hero />
+  <TrustStrip />
+  <FeaturedProjects />
+  <Services />
+  <Process />
+  <ServiceArea />
+  <QuoteCta />
 </BaseLayout>

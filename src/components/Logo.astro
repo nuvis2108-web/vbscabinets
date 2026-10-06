@@ -1,0 +1,24 @@
+---
+// The VBS logo. Currently a cropped copy of the original PNG (dark edge removed).
+// To switch to an SVG later, replace this import and the <Image> with the SVG — callers don't need to change.
+import { Image } from 'astro:assets';
+import logo from '@/assets/brand/logo-vbs.png';
+
+interface Props {
+  class?: string;
+  /** Rendered height in CSS px; width follows the logo's aspect ratio. */
+  height?: number;
+  loading?: 'eager' | 'lazy';
+}
+
+const { class: className, height = 48, loading = 'eager' } = Astro.props;
+---
+
+<Image
+  src={logo}
+  alt="VBS Closets & Cabinets"
+  height={height}
+  densities={[1, 2]}
+  loading={loading}
+  class={className}
+/>

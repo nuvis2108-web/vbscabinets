@@ -1,0 +1,23 @@
+# vbs-quote-mailer — deployed separately from the Pages site:
+#   npx wrangler deploy -c workers/quote-mailer/wrangler.toml
+# Requires Email Routing on vbscabinets.ca with vbscustom@gmail.com verified as a destination address.
+
+name = "vbs-quote-mailer"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# No public URL: only the Pages Function can call this Worker, through its service binding.
+workers_dev = false
+preview_urls = false
+
+[observability]
+enabled = true
+
+[[send_email]]
+name = "MAILER"
+destination_address = "vbscustom@gmail.com"
+
+[vars]
+FROM_ADDRESS = "quotes@vbscabinets.ca"
+FROM_NAME = "VBS Quote Form"
+TO_ADDRESS = "vbscustom@gmail.com"

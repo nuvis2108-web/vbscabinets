@@ -1,0 +1,9 @@
+# Copy to .dev.vars for local development (`npm run dev:functions`). .dev.vars is git-ignored.
+# These are NOT real secrets. Real values go only in the Cloudflare Pages project settings.
+
+# Cloudflare's official Turnstile test secret — always passes. Never use it in production.
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+
+# Any long random string works locally. Production needs its own value:
+#   node -e "console.log(crypto.randomBytes(32).toString('base64url'))"
+PHOTO_LINK_SECRET=local-development-only-not-a-real-secret-0123456789

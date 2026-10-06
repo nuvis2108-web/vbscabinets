@@ -1,0 +1,46 @@
+---
+// Persistent Call / Request a Quote bar for small screens. It stays hidden while a
+// [data-hides-action-bar] element (hero actions, quote section) is on screen, so
+// there is never a second red quote button competing in the same view.
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+---
+
+<div
+  class="fixed inset-x-0 bottom-0 z-30 translate-y-full border-t border-line bg-paper px-4 pt-2 pb-[max(8px,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out data-visible:translate-y-0 lg:hidden"
+  data-action-bar
+  inert
+>
+  <div class="mx-auto grid max-w-md grid-cols-[auto_1fr] gap-2">
+    <a href={site.phone.href} class="btn btn-outline px-6">
+      <Icon name="phone" size={20} />
+      Call
+    </a>
+    <a href={site.quote.href} class="btn btn-primary px-4 whitespace-nowrap">Request a Quote</a>
+  </div>
+</div>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-action-bar]');
+  const blockers = document.querySelectorAll('[data-hides-action-bar]');
+
+  if (bar) {
+    const visibleBlockers = new Set<Element>();
+    const update = () => {
+      const show = visibleBlockers.size === 0;
+      bar.toggleAttribute('data-visible', show);
+      bar.inert = !show;
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visibleBlockers.add(entry.target);
+        else visibleBlockers.delete(entry.target);
+      }
+      update();
+    });
+
+    blockers.forEach((el) => observer.observe(el));
+    if (blockers.length === 0) update();
+  }
+</script>

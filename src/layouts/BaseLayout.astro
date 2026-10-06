@@ -1,24 +1,88 @@
 ---
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/inter';
 import '@/styles/global.css';
+import SiteHeader from '@/components/SiteHeader.astro';
+import SiteFooter from '@/components/SiteFooter.astro';
+import MobileActionBar from '@/components/MobileActionBar.astro';
+import { site } from '@/data/site';
 
 interface Props {
   title: string;
   description?: string;
+  /** Absolute URL of the social sharing image. */
+  ogImage?: string;
+  /** Keep the page out of search results (confirmation pages). */
+  noindex?: boolean;
+  /** The mobile Call / Request a Quote bar. Off on pages where the quote form itself is the action. */
+  actionBar?: boolean;
 }
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description = site.description,
+  ogImage = `${site.url}/assets/images/hero-black-media-wall.jpg`,
+  noindex = false,
+  actionBar = true,
+} = Astro.props;
+
+// Pages are built as /contact.html etc. but served as /contact, so canonical URLs drop the extension.
+const canonicalPath = Astro.url.pathname.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '');
+const canonical = new URL(canonicalPath, site.url).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: site.name,
+  legalName: site.legalName,
+  url: `${site.url}/`,
+  logo: `${site.url}/assets/logo-vbs.png`,
+  image: ogImage,
+  telephone: '+1-437-376-6267',
+  email: site.email.display,
+  description: site.description,
+  address: { '@type': 'PostalAddress', addressLocality: site.baseCity, addressRegion: 'ON', addressCountry: 'CA' },
+  areaServed: site.areas.map((name) => (name === 'GTA' ? 'Greater Toronto Area' : name)),
+  sameAs: [site.instagram.url],
+};
 ---
 
 <!doctype html>
 <html lang="en-CA">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>{title}</title>
-    {description && <meta name="description" content={description} />}
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#f7f4ef" />
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="en_CA" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
   </head>
-  <body class="bg-white text-ink antialiased">
-    <slot />
+  <body class:list={[actionBar && 'pb-[calc(64px+env(safe-area-inset-bottom))] lg:pb-0']}>
+    <a
+      href="#main"
+      class="sr-only z-50 rounded bg-ink px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+    >
+      Skip to content
+    </a>
+    <SiteHeader />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+    {actionBar && <MobileActionBar />}
   </body>
 </html>
