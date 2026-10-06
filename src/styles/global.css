@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* Brand tokens carried over from the legacy site (legacy/index.html :root). */
+@theme {
+  --color-ink: #171717;
+  --color-muted: #625b54;
+  --color-paper: #f7f4ef;
+  --color-accent: #c9242a;
+  --color-accent-dark: #a71b20;
+  --color-warm: #9c7a58;
+  --color-line: #e4ddd3;
+  --color-card: #fbfaf8;
+}
