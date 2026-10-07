@@ -12,23 +12,30 @@ interface Props {
   description?: string;
   /** Absolute URL of the social sharing image. */
   ogImage?: string;
+  /** "article" for blog posts. */
+  ogType?: 'website' | 'article';
+  /** Absolute URL. Defaults to this page's own URL. */
+  canonical?: string;
   /** Keep the page out of search results (confirmation pages). */
   noindex?: boolean;
   /** The mobile Call / Request a Quote bar. Off on pages where the quote form itself is the action. */
   actionBar?: boolean;
 }
 
+const defaultOgImage = `${site.url}/assets/images/projects/black-media-wall-1.jpg`;
+
 const {
   title,
   description = site.description,
-  ogImage = `${site.url}/assets/images/projects/black-media-wall-1.jpg`,
+  ogImage = defaultOgImage,
+  ogType = 'website',
   noindex = false,
   actionBar = true,
 } = Astro.props;
 
 // Pages are built as /contact.html etc. but served as /contact, so canonical URLs drop the extension.
 const canonicalPath = Astro.url.pathname.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '');
-const canonical = new URL(canonicalPath, site.url).href;
+const canonical = Astro.props.canonical ?? new URL(canonicalPath, site.url).href;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -37,7 +44,7 @@ const jsonLd = {
   legalName: site.legalName,
   url: `${site.url}/`,
   logo: `${site.url}/assets/brand/logo-vbs-badge.svg`,
-  image: ogImage,
+  image: defaultOgImage,
   telephone: '+1-437-376-6267',
   email: site.email.display,
   description: site.description,
@@ -59,7 +66,7 @@ const jsonLd = {
     <meta name="theme-color" content="#f7f4ef" />
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

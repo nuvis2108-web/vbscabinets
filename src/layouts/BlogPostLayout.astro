@@ -1,0 +1,157 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogCard from '@/components/BlogCard.astro';
+import QuoteCta from '@/components/QuoteCta.astro';
+import { site } from '@/data/site';
+import { formatDate, isoDate, postUrl, readingMinutes, type BlogPost } from '@/lib/blog';
+
+interface Props {
+  post: BlogPost;
+  related: BlogPost[];
+}
+
+const { post, related } = Astro.props;
+const {
+  title,
+  description,
+  publishDate,
+  updatedDate,
+  author,
+  category,
+  featuredImage,
+  featuredImageAlt,
+  featuredImageNote,
+  seoTitle,
+  metaDescription,
+  canonical,
+  ogImage,
+} = post.data;
+
+const url = new URL(postUrl(post), site.url).href;
+const share = await getImage({ src: ogImage ?? featuredImage, width: 1200, format: 'jpg' });
+const shareUrl = new URL(share.src, site.url).href;
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description: metaDescription ?? description,
+    image: shareUrl,
+    datePublished: isoDate(publishDate),
+    dateModified: isoDate(updatedDate ?? publishDate),
+    author: { '@type': 'Organization', name: author, url: `${site.url}/` },
+    publisher: {
+      '@type': 'Organization',
+      name: site.name,
+      logo: { '@type': 'ImageObject', url: `${site.url}/assets/brand/logo-vbs-badge.svg` },
+    },
+    mainEntityOfPage: canonical ?? url,
+    articleSection: category,
+    inLanguage: 'en-CA',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${site.url}/blog` },
+      { '@type': 'ListItem', position: 3, name: title, item: url },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={seoTitle ?? `${title} | ${site.name}`}
+  description={metaDescription ?? description}
+  ogImage={shareUrl}
+  ogType="article"
+  canonical={canonical}
+>
+  <Fragment slot="head">
+    <meta property="article:published_time" content={isoDate(publishDate)} />
+    {updatedDate && <meta property="article:modified_time" content={isoDate(updatedDate)} />}
+    <meta property="article:section" content={category} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  </Fragment>
+
+  <article class="section pt-10 md:pt-16" aria-labelledby="post-title">
+    <div class="container-site">
+      <div class="max-w-[800px]">
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <li><a href="/" class="hover:text-accent">Home</a></li>
+            <li aria-hidden="true">/</li>
+            <li><a href="/blog" class="hover:text-accent">Blog</a></li>
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" class="line-clamp-1">{title}</li>
+          </ol>
+        </nav>
+
+        <p class="eyebrow mt-8">{category}</p>
+        <h1 id="post-title" class="text-display mt-4">{title}</h1>
+        <p class="text-lead mt-6 max-w-[60ch] text-muted">{description}</p>
+
+        <p class="mt-6 flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
+          <span>By {author}</span>
+          <span aria-hidden="true">·</span>
+          <time datetime={isoDate(publishDate)}>{formatDate(publishDate)}</time>
+          {
+            updatedDate && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>
+                  Updated <time datetime={isoDate(updatedDate)}>{formatDate(updatedDate)}</time>
+                </span>
+              </>
+            )
+          }
+          <span aria-hidden="true">·</span>
+          <span>{readingMinutes(post)} min read</span>
+        </p>
+
+        <figure class="mt-10">
+          <Picture
+            src={featuredImage}
+            formats={['avif', 'webp']}
+            fallbackFormat="jpg"
+            widths={[480, 800, 1200, 1600]}
+            sizes="(min-width: 848px) 800px, 100vw"
+            alt={featuredImageAlt}
+            loading="eager"
+            fetchpriority="high"
+            class="aspect-3/2 w-full rounded-md object-cover"
+          />
+          {featuredImageNote && <figcaption class="mt-2 text-sm text-muted">{featuredImageNote}</figcaption>}
+        </figure>
+
+        <div class="prose-vbs mt-12">
+          <slot />
+        </div>
+
+        <p class="mt-12 border-t border-line pt-6 text-sm text-muted">
+          VBS Closets &amp; Cabinets is based in {site.baseCity} and builds for homes in {site.serviceAreaText}.
+        </p>
+      </div>
+    </div>
+  </article>
+
+  <QuoteCta />
+
+  {
+    related.length > 0 && (
+      <section class="section" aria-labelledby="related-title">
+        <div class="container-site">
+          <h2 id="related-title" class="text-h2">More from the blog</h2>
+          <div class="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {related.map((p) => (
+              <BlogCard post={p} headingLevel={3} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
