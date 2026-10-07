@@ -1,24 +1,33 @@
 ---
-// The VBS logo. Currently a cropped copy of the original PNG (dark edge removed).
-// To switch to an SVG later, replace this import and the <Image> with the SVG — callers don't need to change.
-import { Image } from 'astro:assets';
-import logo from '@/assets/brand/logo-vbs.png';
+// The VBS logo — vector artwork copied 1:1 from the designer's Illustrator file (round "VBS_B" badge,
+// maple leaf inside the B). Two cuts of the same artwork:
+//   badge — full round badge with "Closets and Cabinets" ring; for larger placements (≥ 96px).
+//   mark  — just the VBS letters and leaf; for the header and other small placements.
+// Files live in public/assets/brand/ so they are also available at stable URLs (JSON-LD, favicon).
 
 interface Props {
+  variant?: 'mark' | 'badge';
   class?: string;
-  /** Rendered height in CSS px; width follows the logo's aspect ratio. */
+  /** Rendered height in CSS px; width follows the artwork's aspect ratio. */
   height?: number;
   loading?: 'eager' | 'lazy';
 }
 
-const { class: className, height = 48, loading = 'eager' } = Astro.props;
+const { variant = 'mark', class: className, height = 40, loading = 'eager' } = Astro.props;
+
+// Aspect ratios from each SVG's viewBox.
+const artwork = {
+  mark: { src: '/assets/brand/logo-vbs-mark.svg', ratio: 454.59 / 174.71 },
+  badge: { src: '/assets/brand/logo-vbs-badge.svg', ratio: 1 },
+}[variant];
 ---
 
-<Image
-  src={logo}
+<img
+  src={artwork.src}
   alt="VBS Closets & Cabinets"
+  width={Math.round(height * artwork.ratio)}
   height={height}
-  densities={[1, 2]}
   loading={loading}
+  decoding="async"
   class={className}
 />

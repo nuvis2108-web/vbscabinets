@@ -1,30 +1,59 @@
 ---
+import type { ImageMetadata } from 'astro:assets';
 import { Picture } from 'astro:assets';
-// TODO(content): temporary services image. Replace with a real VBS closet photo when one is available —
-// closets are priority service #2 and have no photo yet. Never fill this with a rendered or AI image.
-import carvedDoor from '@/assets/images/custom-woodwork-detail.jpg';
+// Service photos are stock (Unsplash) and show example styles only.
+// Never caption stock as VBS work, and never use rendered or AI images. Credits: src/assets/images/stock/CREDITS.md
+import kitchen from '@/assets/images/stock/service-walnut-kitchen.webp';
+import closet from '@/assets/images/stock/service-walk-in-closet.webp';
+import mediaWall from '@/assets/images/stock/service-media-wall.webp';
+import fireplace from '@/assets/images/stock/service-fireplace-built-ins.webp';
+import dresser from '@/assets/images/stock/service-walnut-dresser.webp';
+
+interface Service {
+  title: string;
+  text: string;
+  image: ImageMetadata;
+  alt: string;
+  /** object-position for the 4:3 crop. */
+  position: string;
+}
 
 // Priority order per the design skill: cabinetry, closets, media walls, built-ins, woodworking.
-const services = [
+const services: Service[] = [
   {
     title: 'Custom Cabinetry',
     text: 'Kitchen cabinetry, storage cabinets and tailored cabinetry for everyday living, built to your layout and finish.',
+    image: kitchen,
+    alt: 'Kitchen with walnut slab-door cabinetry, a full-height fridge surround and a white waterfall island',
+    position: 'object-[50%_30%]',
   },
   {
     title: 'Closets',
     text: 'Reach-in and walk-in closet layouts with shelving, hanging space, drawers and practical storage.',
+    image: closet,
+    alt: 'Walk-in closet lined with wood-grain shelving, drawer banks and hanging sections',
+    position: 'object-center',
   },
   {
     title: 'Media Walls',
     text: 'TV walls, fluted feature panels and display shelving, with integrated lighting where you want it.',
+    image: mediaWall,
+    alt: 'Living room with white built-in shelving and base cabinets around a wood-panelled TV wall',
+    position: 'object-[85%_40%]',
   },
   {
     title: 'Built-ins',
     text: 'Fireplace built-ins, benches and storage walls designed around the shape of your room.',
+    image: fireplace,
+    alt: 'Painted built-in shelving and cabinets beside a fireplace with a black stone surround',
+    position: 'object-[40%_30%]',
   },
   {
     title: 'Custom Woodworking',
     text: 'Made-to-order furniture and one-off pieces — dressers, nightstands, doors and gates.',
+    image: dresser,
+    alt: 'Walnut mid-century dresser with eight drawers, tapered legs and slim metal pulls',
+    position: 'object-[40%_72%]',
   },
 ];
 
@@ -32,50 +61,50 @@ const alsoAvailable = ['Floating shelves', 'Garage shelving', 'Sliding closet do
 ---
 
 <section id="services" class="section border-t border-line" aria-labelledby="services-title">
-  <div class="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
-    <figure class="order-last lg:order-first lg:col-span-5">
-      <div class="overflow-hidden rounded-md bg-line lg:sticky lg:top-28">
-        <Picture
-          src={carvedDoor}
-          formats={['avif', 'webp']}
-          widths={[480, 720, 960]}
-          sizes="(min-width: 1180px) 440px, (min-width: 1024px) 38vw, 100vw"
-          alt="Teak door and frame with ornamental relief carving, fluted pillars and pierced lattice panels"
-          loading="lazy"
-          class="aspect-4/5 w-full object-cover object-top"
-        />
-      </div>
-      <figcaption class="mt-4 text-sm text-muted">Custom teak door installation</figcaption>
-    </figure>
-
-    <div class="lg:col-span-7">
+  <div class="container-site">
+    <div class="max-w-2xl">
       <p class="eyebrow">What we build</p>
       <h2 id="services-title" class="text-h2 mt-4">Custom work for every room.</h2>
       <p class="text-lead mt-4 max-w-[52ch] text-muted">
         From practical storage to a full feature wall, every piece is built around your space, your needs and your
         preferred finish.
       </p>
+    </div>
 
-      <ol class="mt-12 border-t border-line">
-        {
-          services.map((service, i) => (
-            <li class="grid gap-2 border-b border-line py-6 sm:grid-cols-[64px_1fr] sm:gap-6 sm:py-8">
-              <span class="text-xs font-extrabold tracking-[0.18em] text-accent" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <div>
-                <h3 class="text-h3">{service.title}</h3>
-                <p class="mt-2 max-w-[56ch] text-muted">{service.text}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
+    <ol class="mt-12 border-t border-line">
+      {
+        services.map((service, i) => (
+          <li class="grid gap-4 border-b border-line py-8 md:grid-cols-[64px_1fr_280px] md:items-center md:gap-8">
+            <span class="text-xs font-extrabold tracking-[0.18em] text-accent" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div>
+              <h3 class="text-h3">{service.title}</h3>
+              <p class="mt-2 max-w-[56ch] text-muted">{service.text}</p>
+            </div>
+            <div class="overflow-hidden rounded-md bg-line">
+              <Picture
+                src={service.image}
+                formats={['avif', 'webp']}
+                fallbackFormat="jpg"
+                widths={[320, 560, 720]}
+                sizes="(min-width: 768px) 280px, 100vw"
+                alt={service.alt}
+                loading="lazy"
+                class:list={['aspect-4/3 w-full object-cover', service.position]}
+              />
+            </div>
+          </li>
+        ))
+      }
+    </ol>
 
-      <p class="mt-8 text-sm text-muted">
+    <div class="mt-8 flex flex-col gap-2 text-sm text-muted sm:flex-row sm:justify-between sm:gap-8">
+      <p>
         <span class="font-semibold text-ink">Also available:</span>{' '}
         {alsoAvailable.join(' · ')}
       </p>
+      <p>Photos show example styles.</p>
     </div>
   </div>
 </section>

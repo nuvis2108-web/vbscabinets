@@ -105,10 +105,13 @@ Truth rules (non-negotiable):
 2. Any rendered or AI-generated image must be **clearly labelled as a design concept** on the image itself (visible caption/badge, e.g. "Design concept"), never mixed into the project gallery, and never placed next to "real project" claims.
 3. These files appear to be rendered/AI-generated marketing graphics: `service-tv-walls-built-ins`, `service-fireplace-built-ins`, `service-floating-shelves`, `service-media-walls`, `service-garage-shelving`, `process-before-after`. Treat them as design concepts (rule 2) or leave them out. Prefer leaving them out where a real photo can do the job.
 4. `light-fluted-feature-wall*` shows an unfinished install (bare MDF, painter's tape) — do not use.
-5. Never generate, stock-source or AI-render new imagery to stand in for VBS work. If a section lacks a real photo, use a typographic treatment and flag the gap to the user.
-6. Don't show the same photo twice on one page.
+5. Never generate, stock-source or AI-render new imagery to stand in for VBS work. If a project section lacks a real photo, use a typographic treatment and flag the gap to the user.
+6. **Stock photos (owner-approved 2026-10-06)** are allowed only for the homepage hero, the Services section and generic category imagery — never in Featured Projects, Our Work, portfolio or case studies, and never captioned or implied as VBS work. Sections that use stock carry a small note ("Photos show example styles."). Source from Unsplash first, Pixabay second, via the image-banks tool; reject renders/AI, people and competitor branding. Record every stock file in `src/assets/images/stock/CREDITS.md`.
+7. Don't show the same photo twice on one page.
 
-Real photos available: black media wall (`hero-black-media-wall`, `black-media-wall-wide`, `black-media-wall-detail`), arched fireplace built-in (+ `-alt`), two-tone kitchen (+ `-alt`), `sliding-panel-doors`, `herringbone-wood-gate`, `custom-oak-dresser`, `oak-nightstands`, `custom-woodwork-detail`.
+Featured Projects photos (owner decision 2026-10-07): the owner's retouched and styled versions in `src/assets/images/projects/` (`black-media-wall-1/-2`, `two-tone-custom-kitchen-1/-2`, `arched-fireplace-built-in-1/-2`). Use them exactly as supplied: no re-cropping beyond `object-cover` framing, no CSS filters, no re-editing. No public-facing retouching note (owner decision 2026-10-07). The older unedited versions (`hero-black-media-wall`, `black-media-wall-wide`, `black-media-wall-detail`, `arched-fireplace-built-in(-alt)`, `two-tone-custom-kitchen(-alt)`) are superseded; don't use them.
+
+Other real photos available: `sliding-panel-doors`, `herringbone-wood-gate`, `custom-oak-dresser`, `oak-nightstands`, `custom-woodwork-detail`.
 
 Technical:
 - Images used in components go in `src/assets/images/` and render via `astro:assets` `<Picture>` (AVIF + WebP, responsive `widths`, explicit `sizes`). Keep originals in `public/assets/images/` until the legacy site is retired.
@@ -170,7 +173,7 @@ Secondary (present, but lower in hierarchy): floating shelves, garage shelving, 
 
 ## Brand & content preservation
 
-- Keep the existing VBS identity: the VBS logo (house/wood-grain mark with red), the charcoal/off-white/red/wood palette, and the plain, practical voice.
+- Keep the existing VBS identity: the VBS logo (round "VBS_B" badge with the maple leaf inside the B — `public/assets/brand/logo-vbs-badge.svg` for large placements, `logo-vbs-mark.svg` for the header/favicon; the old rectangular house logo is retired), the charcoal/off-white/red/wood palette, and the plain, practical voice.
 - Keep real content from `legacy/index.html`: services, process steps, contact details, business name, and the company operator line. Rewrite for clarity, don't invent.
 - **Never ship internal notes or design commentary as visible text** (the legacy site leaked lines like "no unfinished fluted wall on the homepage"). Every visible string is written for a customer.
 - Don't invent reviews, ratings, years in business, project counts, warranties, licences or certifications. Leave a clearly marked TODO and tell the user.

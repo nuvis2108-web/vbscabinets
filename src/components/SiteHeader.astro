@@ -6,8 +6,11 @@ import { nav, site } from '@/data/site';
 
 <header class="sticky top-0 z-40 border-b border-line bg-paper">
   <div class="container-site flex h-18 items-center justify-between gap-6 lg:h-20">
-    <a href="/" class="inline-flex min-h-11 shrink-0 items-center" aria-label={`${site.name} — home`}>
-      <Logo class="h-10 w-auto lg:h-12" />
+    <a href="/" class="inline-flex min-h-11 shrink-0 items-center gap-4" aria-label={`${site.name} — home`}>
+      <Logo height={32} class="h-8 w-auto lg:h-10" />
+      <span class="hidden border-l border-line pl-4 text-xs leading-tight font-extrabold tracking-[0.18em] uppercase sm:block" aria-hidden="true">
+        Closets &amp;<br />Cabinets
+      </span>
     </a>
 
     <nav aria-label="Main" class="hidden lg:block">

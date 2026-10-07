@@ -4,12 +4,13 @@ import { Picture, getImage } from 'astro:assets';
 import Icon from '@/components/Icon.astro';
 import { site } from '@/data/site';
 
-import kitchenFront from '@/assets/images/two-tone-custom-kitchen-alt.jpg';
-import kitchenAngle from '@/assets/images/two-tone-custom-kitchen.jpg';
-import fireplaceFront from '@/assets/images/arched-fireplace-built-in-alt.jpg';
-import fireplaceWide from '@/assets/images/arched-fireplace-built-in.jpg';
-import oakDresser from '@/assets/images/custom-oak-dresser.jpg';
-import oakNightstands from '@/assets/images/oak-nightstands.jpg';
+// Owner-retouched project photos (2026-10-07). Use as supplied — never re-crop, recolour or filter them.
+import mediaWallFront from '@/assets/images/projects/black-media-wall-1.png';
+import mediaWallDetail from '@/assets/images/projects/black-media-wall-2.png';
+import kitchenFront from '@/assets/images/projects/two-tone-custom-kitchen-1.png';
+import kitchenAngle from '@/assets/images/projects/two-tone-custom-kitchen-2.png';
+import fireplaceFront from '@/assets/images/projects/arched-fireplace-built-in-1.png';
+import fireplaceDetail from '@/assets/images/projects/arched-fireplace-built-in-2.png';
 
 interface Photo {
   src: ImageMetadata;
@@ -28,14 +29,34 @@ interface Project {
   crop: string;
 }
 
+// Real VBS projects only — never stock or rendered images here.
 const projects: Project[] = [
+  {
+    id: 'black-media-wall',
+    kicker: 'Media wall',
+    title: 'Black Media Wall',
+    description: 'A fluted centre panel framed by arched shelving niches with integrated lighting, white-oak shelves and shaker base cabinets.',
+    span: 7,
+    // Photos are owner-framed; centre them so the card trims as little as possible.
+    crop: 'aspect-4/3 lg:aspect-auto lg:h-96 object-center',
+    photos: [
+      {
+        src: mediaWallFront,
+        alt: 'Black custom media wall with a fluted centre panel, arched shelving niches with integrated lighting, white-oak shelves and shaker lower cabinets with brass knobs',
+      },
+      {
+        src: mediaWallDetail,
+        alt: 'Close-up of an arched niche with LED-lit white-oak shelves beside the fluted panel, above shaker cabinets with brass knobs',
+      },
+    ],
+  },
   {
     id: 'two-tone-kitchen',
     kicker: 'Kitchen cabinetry',
     title: 'Two-Tone Custom Kitchen',
     description: 'White shaker uppers, navy lowers, a slatted-wood island with seating and a wood-trimmed range hood.',
-    span: 7,
-    crop: 'aspect-4/3 lg:aspect-auto lg:h-96 object-[50%_60%]',
+    span: 5,
+    crop: 'aspect-4/3 lg:aspect-auto lg:h-96 object-center',
     photos: [
       {
         src: kitchenFront,
@@ -48,40 +69,21 @@ const projects: Project[] = [
     ],
   },
   {
-    id: 'oak-furniture',
-    kicker: 'Custom woodworking',
-    title: 'Solid Oak Bedroom Furniture',
-    description: 'A made-to-order oak dresser and matching nightstands with angled legs and black bar pulls.',
-    span: 5,
-    // Natural 6:5 frame keeps the top drawers and the angled legs in view.
-    crop: 'aspect-6/5 lg:aspect-auto lg:h-96 object-[50%_70%]',
-    photos: [
-      {
-        src: oakDresser,
-        alt: 'Custom white-oak eight-drawer dresser with mid-century angled legs and black bar pulls',
-      },
-      {
-        src: oakNightstands,
-        alt: 'Pair of matching white-oak nightstands with an open shelf, two drawers and angled legs',
-      },
-    ],
-  },
-  {
     id: 'arched-fireplace',
     kicker: 'Fireplace built-in',
     title: 'Arched Fireplace Built-In',
     description: 'Arched niches with wood floating shelves and flat-panel base cabinets on either side of a stone fireplace.',
     span: 7,
-    // Wide frame anchored low so the cabinetry, not the ceiling light, fills the photo.
-    crop: 'aspect-16/10 lg:aspect-auto lg:h-104 object-[50%_85%]',
+    // Owner-framed 4:3 photo — shown at its own ratio on mobile, no filters.
+    crop: 'aspect-4/3 lg:aspect-auto lg:h-92 object-center',
     photos: [
       {
         src: fireplaceFront,
-        alt: 'White arched built-ins with wood floating shelves and flat-panel base cabinets flanking a stacked-stone fireplace with a wood mantel',
+        alt: 'White arched built-ins with lit wood floating shelves and flat-panel base cabinets flanking a stacked-stone fireplace with a wood mantel',
       },
       {
-        src: fireplaceWide,
-        alt: 'Wider view of the arched fireplace built-ins with matching storage cabinets on both sides',
+        src: fireplaceDetail,
+        alt: 'Close-up of one arched niche with lit wood floating shelves above white flat-panel cabinets with black knobs, beside the stone fireplace',
       },
     ],
   },
@@ -137,6 +139,7 @@ const viewerData = Object.fromEntries(
                 <Picture
                   src={cover.src}
                   formats={['avif', 'webp']}
+                  fallbackFormat="jpg"
                   widths={[480, 720, 960, 1280]}
                   sizes={
                     project.span === 7
@@ -164,7 +167,7 @@ const viewerData = Object.fromEntries(
       }
 
       <div
-        class="flex flex-col items-start justify-between gap-8 rounded-md border border-line bg-card p-6 sm:p-8 lg:col-span-5 lg:h-104"
+        class="flex flex-col items-start justify-between gap-8 rounded-md border border-line bg-card p-6 sm:p-8 lg:col-span-5 lg:h-92"
         data-hides-action-bar
       >
         <div>

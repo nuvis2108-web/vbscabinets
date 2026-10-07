@@ -1,6 +1,8 @@
 ---
 import { Picture } from 'astro:assets';
-import heroImage from '@/assets/images/hero-black-media-wall.jpg';
+// Stock photo (Unsplash, Franco Debartolo) — an example style, not a VBS project. Don't caption it as VBS work.
+// Credits: src/assets/images/stock/CREDITS.md
+import heroImage from '@/assets/images/stock/hero-arched-built-ins-fireplace.webp';
 import { site } from '@/data/site';
 ---
 
@@ -19,20 +21,20 @@ import { site } from '@/data/site';
       </div>
     </div>
 
-    <figure class="lg:col-span-6">
-      <div class="overflow-hidden rounded-md bg-ink shadow-frame">
+    <div class="lg:col-span-6">
+      <div class="overflow-hidden rounded-md bg-line shadow-frame">
         <Picture
           src={heroImage}
           formats={['avif', 'webp']}
+          fallbackFormat="jpg"
           widths={[480, 720, 960, 1280, 1600]}
           sizes="(min-width: 1180px) 560px, (min-width: 1024px) 48vw, 100vw"
-          alt="Black custom media wall with a fluted centre panel, arched shelving niches with integrated lighting, white-oak shelves and shaker lower cabinets"
+          alt="Living room with dark-stained arched built-in shelving and cabinets on both sides of a marble fireplace surround"
           loading="eager"
           fetchpriority="high"
-          class="aspect-4/3 w-full object-cover"
+          class="aspect-4/3 w-full object-cover object-[50%_40%]"
         />
       </div>
-      <figcaption class="mt-4 text-sm text-muted">VBS project · Custom media wall</figcaption>
-    </figure>
+    </div>
   </div>
 </section>

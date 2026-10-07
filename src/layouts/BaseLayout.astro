@@ -21,7 +21,7 @@ interface Props {
 const {
   title,
   description = site.description,
-  ogImage = `${site.url}/assets/images/hero-black-media-wall.jpg`,
+  ogImage = `${site.url}/assets/images/projects/black-media-wall-1.jpg`,
   noindex = false,
   actionBar = true,
 } = Astro.props;
@@ -36,7 +36,7 @@ const jsonLd = {
   name: site.name,
   legalName: site.legalName,
   url: `${site.url}/`,
-  logo: `${site.url}/assets/logo-vbs.png`,
+  logo: `${site.url}/assets/brand/logo-vbs-badge.svg`,
   image: ogImage,
   telephone: '+1-437-376-6267',
   email: site.email.display,
