@@ -115,7 +115,7 @@ const viewerData = Object.fromEntries(
 
 <section id="projects" class="section" aria-labelledby="projects-title">
   <div class="container-site">
-    <div class="max-w-2xl">
+    <div class="max-w-2xl" data-reveal>
       <p class="eyebrow">Selected projects</p>
       <h2 id="projects-title" class="text-h2 mt-4">Built for real homes.</h2>
       <p class="text-lead mt-4 text-muted">
@@ -128,7 +128,7 @@ const viewerData = Object.fromEntries(
         projects.map((project) => {
           const [cover] = project.photos;
           return (
-            <article class={project.span === 7 ? 'lg:col-span-7' : 'lg:col-span-5'}>
+            <article class={project.span === 7 ? 'lg:col-span-7' : 'lg:col-span-5'} data-reveal data-draw-group>
               <button
                 type="button"
                 class="group relative block w-full cursor-zoom-in overflow-hidden rounded-md bg-line"
@@ -149,17 +149,21 @@ const viewerData = Object.fromEntries(
                   alt={cover.alt}
                   loading="lazy"
                   class:list={[
-                    'w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]',
+                    'w-full object-cover transition-transform duration-(--dur-slow) ease-out-quint motion-safe:group-hover:scale-[1.03] motion-safe:group-focus-visible:scale-[1.03]',
                     project.crop,
                   ]}
                 />
                 <span class="absolute right-4 bottom-4 inline-flex items-center gap-2 rounded-sm bg-paper px-2 py-1 text-xs font-semibold text-ink">
-                  <Icon name="expand" size={16} />
+                  <Icon
+                    name="expand"
+                    size={16}
+                    class="transition-transform duration-(--dur-fast) ease-out-quint motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5 motion-safe:group-focus-visible:translate-x-0.5 motion-safe:group-focus-visible:-translate-y-0.5"
+                  />
                   {project.photos.length} photos
                 </span>
               </button>
               <p class="eyebrow mt-6">{project.kicker}</p>
-              <h3 class="text-h3 mt-2">{project.title}</h3>
+              <h3 class="text-h3 mt-2"><span class="link-draw">{project.title}</span></h3>
               <p class="mt-2 max-w-[60ch] text-muted">{project.description}</p>
             </article>
           );
@@ -168,6 +172,7 @@ const viewerData = Object.fromEntries(
 
       <div
         class="flex flex-col items-start justify-between gap-8 rounded-md border border-line bg-card p-6 sm:p-8 lg:col-span-5 lg:h-92"
+        data-reveal
         data-hides-action-bar
       >
         <div>
@@ -185,7 +190,7 @@ const viewerData = Object.fromEntries(
 <dialog
   id="project-viewer"
   aria-labelledby="project-viewer-title"
-  class="m-0 h-dvh max-h-none w-screen max-w-none bg-ink/95 p-0 text-white backdrop:bg-transparent"
+  class="viewer-panel m-0 h-dvh max-h-none w-screen max-w-none bg-ink/95 p-0 text-white backdrop:bg-transparent"
 >
   <div class="flex h-full flex-col">
     <div class="flex items-center justify-between gap-4 px-4 py-2 sm:px-6">
@@ -201,7 +206,7 @@ const viewerData = Object.fromEntries(
     </div>
 
     <figure class="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-4 pb-4 sm:px-16">
-      <img data-viewer-image alt="" class="max-h-full min-h-0 w-auto max-w-full object-contain" decoding="async" />
+      <img data-viewer-image alt="" class="viewer-image max-h-full min-h-0 w-auto max-w-full object-contain" decoding="async" />
       <figcaption class="max-w-[70ch] text-center text-sm text-white/80" data-viewer-caption></figcaption>
     </figure>
 
@@ -246,6 +251,8 @@ const viewerData = Object.fromEntries(
 
     let current: ViewerProject | undefined;
     let index = 0;
+    let swapId = 0;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const render = () => {
       if (!current) return;
@@ -256,12 +263,23 @@ const viewerData = Object.fromEntries(
       image.alt = photo.alt;
       caption.textContent = photo.alt;
       count.textContent = `${index + 1} / ${current.photos.length}`;
+      // Warm the cache for the next photo so stepping through feels instant.
+      if (current.photos.length > 1) new Image().src = current.photos[(index + 1) % current.photos.length].src;
     };
 
-    const step = (delta: number) => {
+    // Crossfade: fade the current photo out, swap once the next one is decoded, fade back in.
+    const step = async (delta: number) => {
       if (!current) return;
       index = (index + delta + current.photos.length) % current.photos.length;
+      const id = ++swapId;
+      if (!reducedMotion.matches) {
+        image.setAttribute('data-swapping', '');
+        await new Promise((resolve) => setTimeout(resolve, 120));
+        if (id !== swapId) return;
+      }
       render();
+      await image.decode().catch(() => {});
+      if (id === swapId) image.removeAttribute('data-swapping');
     };
 
     document.querySelectorAll<HTMLButtonElement>('[data-viewer-open]').forEach((button) => {
@@ -292,8 +310,13 @@ const viewerData = Object.fromEntries(
     });
 
     viewer.addEventListener('close', () => {
-      image.removeAttribute('src');
+      swapId++;
       current = undefined;
+      // Clear the photo after the fade-out, unless the viewer was reopened in the meantime.
+      setTimeout(() => {
+        if (!viewer.open) image.removeAttribute('src');
+      }, 200);
+      image.removeAttribute('data-swapping');
     });
   }
 </script>

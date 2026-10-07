@@ -59,6 +59,8 @@ const jsonLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <!-- Marks JS as available before first paint; scroll-reveal styles only apply under html.js. -->
+    <script is:inline>document.documentElement.classList.add('js');</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -85,11 +87,43 @@ const jsonLd = {
     >
       Skip to content
     </a>
+    <!-- Header-scroll sentinel: once this 8px strip leaves the viewport, the page has scrolled. -->
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-2" aria-hidden="true" data-scroll-sentinel></div>
     <SiteHeader />
     <main id="main">
       <slot />
     </main>
     <SiteFooter />
     {actionBar && <MobileActionBar />}
+
+    <!-- Scroll reveal + header scroll state. Inline so it can't fail to load and leave revealed content hidden. -->
+    <script is:inline>
+      (() => {
+        try {
+          const header = document.querySelector('.site-header');
+          const sentinel = document.querySelector('[data-scroll-sentinel]');
+          if (header && sentinel) {
+            new IntersectionObserver(([entry]) => header.toggleAttribute('data-scrolled', !entry.isIntersecting)).observe(sentinel);
+          }
+
+          // Items entering together stagger 40ms apart (capped), each reveals once.
+          const reveal = new IntersectionObserver(
+            (entries) => {
+              let n = 0;
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                entry.target.style.setProperty('--reveal-delay', `${Math.min(n++, 5) * 40}ms`);
+                entry.target.classList.add('is-revealed');
+                reveal.unobserve(entry.target);
+              }
+            },
+            { rootMargin: '0px 0px -8% 0px' },
+          );
+          document.querySelectorAll('[data-reveal]').forEach((el) => reveal.observe(el));
+        } catch {
+          document.documentElement.classList.remove('js');
+        }
+      })();
+    </script>
   </body>
 </html>

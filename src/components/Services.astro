@@ -62,7 +62,7 @@ const alsoAvailable = ['Floating shelves', 'Garage shelving', 'Sliding closet do
 
 <section id="services" class="section border-t border-line" aria-labelledby="services-title">
   <div class="container-site">
-    <div class="max-w-2xl">
+    <div class="max-w-2xl" data-reveal>
       <p class="eyebrow">What we build</p>
       <h2 id="services-title" class="text-h2 mt-4">Custom work for every room.</h2>
       <p class="text-lead mt-4 max-w-[52ch] text-muted">
@@ -74,7 +74,7 @@ const alsoAvailable = ['Floating shelves', 'Garage shelving', 'Sliding closet do
     <ol class="mt-12 border-t border-line">
       {
         services.map((service, i) => (
-          <li class="grid gap-4 border-b border-line py-8 md:grid-cols-[64px_1fr_280px] md:items-center md:gap-8">
+          <li class="grid gap-4 border-b border-line py-8 md:grid-cols-[64px_1fr_280px] md:items-center md:gap-8" data-reveal>
             <span class="text-xs font-extrabold tracking-[0.18em] text-accent" aria-hidden="true">
               {String(i + 1).padStart(2, '0')}
             </span>
@@ -82,7 +82,7 @@ const alsoAvailable = ['Floating shelves', 'Garage shelving', 'Sliding closet do
               <h3 class="text-h3">{service.title}</h3>
               <p class="mt-2 max-w-[56ch] text-muted">{service.text}</p>
             </div>
-            <div class="overflow-hidden rounded-md bg-line">
+            <div class="reveal-wipe overflow-hidden rounded-md bg-line">
               <Picture
                 src={service.image}
                 formats={['avif', 'webp']}
@@ -99,7 +99,7 @@ const alsoAvailable = ['Floating shelves', 'Garage shelving', 'Sliding closet do
       }
     </ol>
 
-    <div class="mt-8 flex flex-col gap-2 text-sm text-muted sm:flex-row sm:justify-between sm:gap-8">
+    <div class="mt-8 flex flex-col gap-2 text-sm text-muted sm:flex-row sm:justify-between sm:gap-8" data-reveal>
       <p>
         <span class="font-semibold text-ink">Also available:</span>{' '}
         {alsoAvailable.join(' · ')}

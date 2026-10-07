@@ -14,7 +14,7 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
 ---
 
 <!-- The title link stretches over the whole card, so there is one link per card for keyboard and screen-reader users. -->
-<article class="group relative flex flex-col">
+<article class="group relative flex flex-col" data-reveal data-draw-group>
   <div class="overflow-hidden rounded-md bg-line">
     <Picture
       src={featuredImage}
@@ -24,16 +24,16 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
       sizes="(min-width: 1180px) 360px, (min-width: 1024px) 30vw, (min-width: 640px) 46vw, 100vw"
       alt={featuredImageAlt}
       loading="lazy"
-      class="aspect-3/2 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+      class="aspect-3/2 w-full object-cover transition-transform duration-(--dur-slow) ease-out-quint motion-safe:group-hover:scale-[1.03] motion-safe:group-focus-within:scale-[1.03]"
     />
   </div>
   <p class="eyebrow mt-6">{category}</p>
   <Heading class="text-h4 mt-2">
     <a
       href={postUrl(post)}
-      class="underline-offset-4 group-hover:underline after:absolute after:inset-0 after:rounded-md focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-ink"
+      class="after:absolute after:inset-0 after:rounded-md focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-ink"
     >
-      {title}
+      <span class="link-draw">{title}</span>
     </a>
   </Heading>
   <p class="mt-2 line-clamp-3 max-w-[60ch] text-muted">{description}</p>

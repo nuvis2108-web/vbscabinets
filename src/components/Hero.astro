@@ -3,21 +3,25 @@ import { Picture } from 'astro:assets';
 // Stock photo (Unsplash, Franco Debartolo) — an example style, not a VBS project. Don't caption it as VBS work.
 // Credits: src/assets/images/stock/CREDITS.md
 import heroImage from '@/assets/images/stock/hero-arched-built-ins-fireplace.webp';
+import Icon from '@/components/Icon.astro';
 import { site } from '@/data/site';
 ---
 
 <section class="pt-10 pb-12 md:pt-16 lg:pt-20 lg:pb-16" aria-labelledby="hero-title">
   <div class="container-site grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
     <div class="lg:col-span-6">
-      <p class="eyebrow">Custom millwork · {site.baseCity}</p>
-      <h1 id="hero-title" class="text-display mt-4">Cabinetry and built-ins, made to fit your room.</h1>
-      <p class="text-lead mt-6 max-w-[46ch] text-muted lg:mt-8">
+      <p class="eyebrow hero-in" style="--i: 0">Custom millwork · {site.baseCity}</p>
+      <h1 id="hero-title" class="text-display hero-in mt-4" style="--i: 1">Cabinetry and built-ins, made to fit your room.</h1>
+      <p class="text-lead hero-in mt-6 max-w-[46ch] text-muted lg:mt-8" style="--i: 2">
         Kitchens, closets, media walls and fireplace built-ins — planned with you, then built and installed by VBS
         for homes across {site.baseCity} and the GTA.
       </p>
-      <div class="mt-8 lg:mt-10 flex flex-col gap-4 sm:flex-row" data-hides-action-bar>
+      <div class="hero-in mt-8 lg:mt-10 flex flex-col gap-4 sm:flex-row" style="--i: 3" data-hides-action-bar>
         <a href={site.quote.href} class="btn btn-primary">Request a Free Quote</a>
-        <a href="/#projects" class="btn btn-outline">View our work</a>
+        <a href="/#projects" class="btn btn-outline">
+          View our work
+          <Icon name="arrow-right" size={20} class="btn-arrow" />
+        </a>
       </div>
     </div>
 
@@ -32,7 +36,7 @@ import { site } from '@/data/site';
           alt="Living room with dark-stained arched built-in shelving and cabinets on both sides of a marble fireplace surround"
           loading="eager"
           fetchpriority="high"
-          class="aspect-4/3 w-full object-cover object-[50%_40%]"
+          class="hero-settle aspect-4/3 w-full object-cover object-[50%_40%]"
         />
       </div>
     </div>

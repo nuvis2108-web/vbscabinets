@@ -4,7 +4,7 @@ import Icon from '@/components/Icon.astro';
 import { nav, site } from '@/data/site';
 ---
 
-<header class="sticky top-0 z-40 border-b border-line bg-paper">
+<header class="site-header sticky top-0 z-40 border-b bg-paper">
   <div class="container-site flex h-18 items-center justify-between gap-6 lg:h-20">
     <a href="/" class="inline-flex min-h-11 shrink-0 items-center gap-4" aria-label={`${site.name} — home`}>
       <Logo height={32} class="h-8 w-auto lg:h-10" />
@@ -18,7 +18,7 @@ import { nav, site } from '@/data/site';
         {
           nav.map((item) => (
             <li>
-              <a href={item.href} class="inline-flex min-h-11 items-center underline-offset-8 transition-colors hover:text-accent hover:underline">
+              <a href={item.href} class="nav-link inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 {item.label}
               </a>
             </li>
@@ -48,7 +48,7 @@ import { nav, site } from '@/data/site';
 <dialog
   id="site-menu"
   aria-label="Site menu"
-  class="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-none bg-paper p-0 text-ink transition-transform duration-300 ease-out backdrop:bg-ink/50 sm:max-w-sm starting:open:translate-x-full"
+  class="menu-panel fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-full max-w-none bg-paper p-0 text-ink sm:max-w-sm"
 >
   <div class="flex h-full flex-col">
     <div class="flex h-18 items-center justify-between border-b border-line px-6">
@@ -66,8 +66,8 @@ import { nav, site } from '@/data/site';
     <nav aria-label="Mobile" class="flex-1 overflow-y-auto px-6 py-8">
       <ul class="flex flex-col">
         {
-          nav.map((item) => (
-            <li class="border-b border-line">
+          nav.map((item, i) => (
+            <li class="border-b border-line" data-menu-item style={`--i: ${i}`}>
               <a href={item.href} class="flex min-h-14 items-center text-h4" data-menu-link>
                 {item.label}
               </a>

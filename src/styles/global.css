@@ -19,9 +19,23 @@
   --color-card: #fbfaf8;
 
   --shadow-frame: 0 16px 48px rgb(20 18 15 / 0.1);
+  /* Barely-there lift for the sticky header once the page scrolls. */
+  --shadow-header: 0 1px 16px rgb(20 18 15 / 0.06);
+
+  /* Motion: one decelerating curve for arrivals, a quicker one for exits. */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-soft: cubic-bezier(0.4, 0, 1, 1);
 }
 
 @layer base {
+  :root {
+    /* Motion durations. Exits run at roughly 60-70% of the matching entrance. */
+    --dur-fast: 200ms;
+    --dur-base: 400ms;
+    --dur-slow: 700ms;
+    --dur-exit: 160ms;
+  }
+
   html {
     scroll-behavior: smooth;
     /* Keep anchored sections clear of the sticky header. */
@@ -148,10 +162,26 @@
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    transition:
+      background-color var(--dur-fast) ease,
+      border-color var(--dur-fast) ease,
+      color var(--dur-fast) ease,
+      transform var(--dur-fast) var(--ease-out-quint);
   }
   .btn:hover {
     transform: translateY(-1px);
+  }
+  .btn:active {
+    transform: translateY(0);
+    transition-duration: 80ms;
+  }
+  /* Trailing arrow inside a button nudges forward on hover/focus. */
+  .btn-arrow {
+    transition: transform var(--dur-fast) var(--ease-out-quint);
+  }
+  .btn:hover .btn-arrow,
+  .btn:focus-visible .btn-arrow {
+    transform: translateX(4px);
   }
   .btn-primary {
     background-color: var(--color-accent);
@@ -267,12 +297,18 @@
   /* Blog article body (Markdown output). Type scale and 8px spacing from the design skill. */
   .prose-vbs {
     max-width: 65ch;
+    line-height: 1.7;
+  }
+  @media (min-width: 768px) {
+    .prose-vbs {
+      font-size: 1.0625rem;
+    }
   }
   .prose-vbs > * + * {
     margin-top: 16px;
   }
   .prose-vbs h2 {
-    margin-top: 48px;
+    margin-top: 56px;
     font-family: var(--font-display);
     font-size: 1.5rem;
     line-height: 1.2;
@@ -352,5 +388,220 @@
     margin-block: 48px;
     border: 0;
     border-top: 1px solid var(--color-line);
+  }
+
+  /* ---------------------------------------------------------------------------------------------
+     Motion. Everything below animates transform, opacity or clip-path only (no layout shift), and
+     everything that moves on its own sits inside prefers-reduced-motion: no-preference.
+     --------------------------------------------------------------------------------------------- */
+
+  /* Drawn underline for text links and titles. A 1px solid line (not a colour gradient) that grows from the left. */
+  .link-draw {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size var(--dur-base) var(--ease-out-quint);
+  }
+
+  /* A card's title underline draws in while its link or button is hovered or focused. */
+  [data-draw-group]:has(:is(a, button):focus-visible) .link-draw {
+    background-size: 100% 1px;
+  }
+  @media (hover: hover) {
+    [data-draw-group]:has(:is(a, button):hover) .link-draw {
+      background-size: 100% 1px;
+    }
+  }
+
+  /* Header nav: a thin red line that draws in under the hovered or focused link. */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    left: 0;
+    height: 1px;
+    background-color: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease-out-quint);
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* Sticky header: flush at the top of the page, hairline and soft lift once scrolled. Without JS the border always shows. */
+  .site-header {
+    border-bottom-color: var(--color-line);
+    transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  }
+  html.js .site-header:not([data-scrolled]) {
+    border-bottom-color: transparent;
+  }
+  .site-header[data-scrolled] {
+    box-shadow: var(--shadow-header);
+  }
+
+  /* Mobile menu: slides in, slides out faster, backdrop fades. */
+  .menu-panel {
+    transform: translateX(100%);
+    transition:
+      transform var(--dur-exit) var(--ease-in-soft),
+      overlay var(--dur-exit) allow-discrete,
+      display var(--dur-exit) allow-discrete;
+  }
+  .menu-panel[open] {
+    transform: none;
+    transition-duration: 320ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+  @starting-style {
+    .menu-panel[open] {
+      transform: translateX(100%);
+    }
+  }
+  .menu-panel::backdrop {
+    background-color: rgb(23 23 23 / 0);
+    transition:
+      background-color var(--dur-exit) ease,
+      overlay var(--dur-exit) allow-discrete,
+      display var(--dur-exit) allow-discrete;
+  }
+  .menu-panel[open]::backdrop {
+    background-color: rgb(23 23 23 / 0.5);
+    transition-duration: 320ms;
+  }
+  @starting-style {
+    .menu-panel[open]::backdrop {
+      background-color: rgb(23 23 23 / 0);
+    }
+  }
+
+  /* Photo viewer: fades open, closes faster, and crossfades between photos. */
+  .viewer-panel {
+    opacity: 0;
+    transition:
+      opacity var(--dur-exit) ease,
+      overlay var(--dur-exit) allow-discrete,
+      display var(--dur-exit) allow-discrete;
+  }
+  .viewer-panel[open] {
+    opacity: 1;
+    transition-duration: 260ms;
+  }
+  @starting-style {
+    .viewer-panel[open] {
+      opacity: 0;
+    }
+  }
+  .viewer-image {
+    transition: opacity var(--dur-fast) ease;
+  }
+  .viewer-image[data-swapping] {
+    opacity: 0;
+    transition-duration: 120ms;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Scroll reveal. Content is only hidden once the reveal script has run (html.js), so it can never stay invisible. */
+    html.js [data-reveal] {
+      opacity: 0;
+      transform: translateY(12px);
+      transition:
+        opacity var(--dur-base) var(--ease-out-quint),
+        transform var(--dur-base) var(--ease-out-quint);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+    html.js [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Services: the photo unveils left to right just after its row fades up. */
+    html.js [data-reveal] .reveal-wipe {
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path var(--dur-slow) var(--ease-out-quint);
+      transition-delay: calc(var(--reveal-delay, 0ms) + 120ms);
+    }
+    html.js [data-reveal].is-revealed .reveal-wipe {
+      clip-path: inset(0);
+    }
+
+    /* Hero: a short sequence on load (CSS only). The photo never fades, so it paints immediately (LCP). */
+    .hero-in {
+      animation: rise-in 600ms var(--ease-out-quint) both;
+      animation-delay: calc(var(--i, 0) * 70ms);
+    }
+    .hero-settle {
+      animation: settle-in 1200ms var(--ease-out-quint) both;
+    }
+
+    /* Mobile menu links follow the panel in, 30ms apart. */
+    .menu-panel[open] [data-menu-item] {
+      animation: rise-in 360ms var(--ease-out-quint) both;
+      animation-delay: calc(120ms + var(--i, 0) * 30ms);
+    }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @keyframes settle-in {
+    from {
+      transform: scale(1.02);
+    }
+  }
+
+  /* Blog reading progress: a 2px wood-tone line under the header, driven by scroll position with no JS.
+     Browsers without scroll-driven animations simply don't show it. */
+  .reading-progress {
+    display: none;
+  }
+  @supports (animation-timeline: view()) {
+    .article-scope {
+      timeline-scope: --article;
+    }
+    .article-scope .prose-vbs {
+      view-timeline: --article block;
+    }
+    .reading-progress {
+      display: block;
+      position: fixed;
+      top: 71px;
+      right: 0;
+      left: 0;
+      z-index: 41;
+      height: 2px;
+      background-color: var(--color-warm);
+      transform-origin: 0 50%;
+      pointer-events: none;
+      animation: reading-progress linear both;
+    }
+    /* Kept in its own rule: the CSS minifier otherwise folds the timeline into the animation shorthand, which browsers reject. */
+    .article-scope .reading-progress {
+      animation-timeline: --article;
+      animation-range: contain 0% contain 100%;
+    }
+    @media (min-width: 1024px) {
+      .reading-progress {
+        top: 79px;
+      }
+    }
+  }
+  @keyframes reading-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
   }
 }
