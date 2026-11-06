@@ -1,10 +1,12 @@
 import type { APIRoute } from 'astro';
 import { site } from '@/data/site';
 import { getPosts, isoDate, postUrl } from '@/lib/blog';
+import { services } from '@/data/services';
 
 // Generated at build time so new blog posts are listed automatically. Replaces the old hand-written public/sitemap.xml.
 const staticPages = [
   { path: '/', changefreq: 'monthly', priority: '1.0' },
+  ...services.map((s) => ({ path: `/${s.slug}`, changefreq: 'monthly', priority: '0.9' })),
   { path: '/contact', changefreq: 'yearly', priority: '0.8' },
   { path: '/blog', changefreq: 'weekly', priority: '0.7' },
   { path: '/privacy', changefreq: 'yearly', priority: '0.2' },

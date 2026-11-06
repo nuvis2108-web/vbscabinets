@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro:assets';
 import { Picture } from 'astro:assets';
+import Icon from '@/components/Icon.astro';
 // Service photos are stock (Unsplash) and show example styles only.
 // Never caption stock as VBS work, and never use rendered or AI images. Credits: src/assets/images/stock/CREDITS.md
 import kitchen from '@/assets/images/stock/service-walnut-kitchen.webp';
@@ -11,6 +12,7 @@ import dresser from '@/assets/images/stock/service-walnut-dresser.webp';
 
 interface Service {
   title: string;
+  href: string;
   text: string;
   image: ImageMetadata;
   alt: string;
@@ -22,6 +24,7 @@ interface Service {
 const services: Service[] = [
   {
     title: 'Custom Cabinetry',
+    href: '/custom-cabinets',
     text: 'Kitchen cabinetry, storage cabinets and tailored cabinetry for everyday living, built to your layout and finish.',
     image: kitchen,
     alt: 'Kitchen with walnut slab-door cabinetry, a full-height fridge surround and a white waterfall island',
@@ -29,6 +32,7 @@ const services: Service[] = [
   },
   {
     title: 'Closets',
+    href: '/custom-closets',
     text: 'Reach-in and walk-in closet layouts with shelving, hanging space, drawers and practical storage.',
     image: closet,
     alt: 'Walk-in closet lined with wood-grain shelving, drawer banks and hanging sections',
@@ -36,6 +40,7 @@ const services: Service[] = [
   },
   {
     title: 'Media Walls',
+    href: '/media-walls',
     text: 'TV walls, fluted feature panels and display shelving, with integrated lighting where you want it.',
     image: mediaWall,
     alt: 'Living room with white built-in shelving and base cabinets around a wood-panelled TV wall',
@@ -43,6 +48,7 @@ const services: Service[] = [
   },
   {
     title: 'Built-ins',
+    href: '/built-ins',
     text: 'Fireplace built-ins, benches and storage walls designed around the shape of your room.',
     image: fireplace,
     alt: 'Painted built-in shelving and cabinets beside a fireplace with a black stone surround',
@@ -50,6 +56,7 @@ const services: Service[] = [
   },
   {
     title: 'Custom Woodworking',
+    href: '/custom-woodworking',
     text: 'Made-to-order furniture and one-off pieces — dressers, nightstands, doors and gates.',
     image: dresser,
     alt: 'Walnut mid-century dresser with eight drawers, tapered legs and slim metal pulls',
@@ -74,13 +81,19 @@ const alsoAvailable = ['Floating shelves', 'Garage shelving', 'Sliding closet do
     <ol class="mt-12 border-t border-line">
       {
         services.map((service, i) => (
-          <li class="grid gap-4 border-b border-line py-8 md:grid-cols-[64px_1fr_280px] md:items-center md:gap-8" data-reveal>
+          <li class="grid gap-4 border-b border-line py-8 md:grid-cols-[64px_1fr_280px] md:items-center md:gap-8" data-reveal data-draw-group>
             <span class="text-xs font-extrabold tracking-[0.18em] text-accent" aria-hidden="true">
               {String(i + 1).padStart(2, '0')}
             </span>
             <div>
-              <h3 class="text-h3">{service.title}</h3>
+              <h3 class="text-h3">
+                <a href={service.href} class="hover:text-accent"><span class="link-draw">{service.title}</span></a>
+              </h3>
               <p class="mt-2 max-w-[56ch] text-muted">{service.text}</p>
+              <a href={service.href} class="mt-2 inline-flex min-h-11 items-center gap-2 text-sm font-semibold hover:text-accent" aria-hidden="true" tabindex="-1">
+                Learn more
+                <Icon name="arrow-right" size={16} />
+              </a>
             </div>
             <div class="reveal-wipe overflow-hidden rounded-md bg-line">
               <Picture

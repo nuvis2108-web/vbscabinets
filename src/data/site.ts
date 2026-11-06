@@ -12,6 +12,8 @@ export const site = {
   whatsapp: 'https://wa.me/14373766267',
   email: { display: email, href: `mailto:${email}` },
   instagram: { handle: '@vbsclosetscabinets', url: 'https://www.instagram.com/vbsclosetscabinets/' },
+  /** Google Business Profile (Maps CID link). */
+  googleProfile: 'https://www.google.com/maps?cid=9080133752743345333',
   baseCity: 'Hamilton',
   /** The one service-area list. Every page reads from here so the towns never drift apart. */
   towns: serviceTowns,
