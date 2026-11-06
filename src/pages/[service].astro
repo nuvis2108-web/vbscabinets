@@ -1,0 +1,308 @@
+---
+// One page per service: /custom-cabinets, /custom-closets, /media-walls, /built-ins, /custom-woodworking.
+// Content lives in src/data/services.ts.
+import { Picture, getImage } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Process from '@/components/Process.astro';
+import QuoteCta from '@/components/QuoteCta.astro';
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+import { services, type Service } from '@/data/services';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { service: service.slug }, props: { service } }));
+}
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+const url = `${site.url}/${service.slug}`;
+const others = services.filter((s) => s.slug !== service.slug);
+
+const share = await getImage({ src: service.hero.src, width: 1200, format: 'jpg' });
+const shareUrl = new URL(share.src, site.url).href;
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${url}#service`,
+    name: service.h1,
+    serviceType: service.serviceType,
+    description: service.metaDescription,
+    url,
+    image: shareUrl,
+    provider: { '@id': `${site.url}/#business` },
+    areaServed: site.areas.map((name) => ({ '@type': 'City', name: name === 'GTA' ? 'Greater Toronto Area' : name })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: service.faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: 'Services', item: `${site.url}/#services` },
+      { '@type': 'ListItem', position: 3, name: service.name, item: url },
+    ],
+  },
+];
+
+const stockNote = 'Photo shows an example style.';
+---
+
+<BaseLayout title={service.seoTitle} description={service.metaDescription} ogImage={shareUrl}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  </Fragment>
+
+  <!-- Hero -->
+  <section class="pt-10 pb-12 md:pt-16 lg:pb-16" aria-labelledby="service-title">
+    <div class="container-site">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-2 text-sm text-muted">
+          <li><a href="/" class="hover:text-accent">Home</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href="/#services" class="hover:text-accent">Services</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page">{service.name}</li>
+        </ol>
+      </nav>
+
+      <div class="mt-8 grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-6">
+          <p class="eyebrow hero-in" style="--i: 0">{service.eyebrow}</p>
+          <h1 id="service-title" class="text-display hero-in mt-4" style="--i: 1">{service.h1}</h1>
+          <p class="text-lead hero-in mt-6 max-w-[46ch] text-muted" style="--i: 2">{service.lead}</p>
+          <div class="hero-in mt-8 flex flex-col gap-4 sm:flex-row" style="--i: 3" data-hides-action-bar>
+            <a href={site.quote.href} class="btn btn-primary">Request a Free Quote</a>
+            <a href={site.phone.href} class="btn btn-outline">
+              <Icon name="phone" size={20} />
+              Call {site.phone.display}
+            </a>
+          </div>
+        </div>
+
+        <figure class="lg:col-span-6">
+          <div class="overflow-hidden rounded-md bg-line shadow-frame">
+            <Picture
+              src={service.hero.src}
+              formats={['avif', 'webp']}
+              fallbackFormat="jpg"
+              widths={[480, 720, 960, 1280]}
+              sizes="(min-width: 1180px) 560px, (min-width: 1024px) 48vw, 100vw"
+              alt={service.hero.alt}
+              loading="eager"
+              fetchpriority="high"
+              class="hero-settle aspect-4/3 w-full object-cover object-center"
+            />
+          </div>
+          <figcaption class="mt-2 text-sm text-muted">{service.hero.stock ? stockNote : service.hero.caption}</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro + what we build -->
+  <section class="section border-t border-line" aria-labelledby="offer-title">
+    <div class="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5" data-reveal>
+        <p class="eyebrow">What we build</p>
+        <h2 id="offer-title" class="text-h2 mt-4">Made to fit your room.</h2>
+        <div class="mt-6 flex max-w-[56ch] flex-col gap-4 text-muted">
+          {service.intro.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+      <ul class="border-t border-line lg:col-span-7">
+        {
+          service.offerings.map((item) => (
+            <li class="grid gap-2 border-b border-line py-6 sm:grid-cols-[200px_1fr] sm:gap-8" data-reveal>
+              <h3 class="text-h4">{item.title}</h3>
+              <p class="text-muted">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Our work (real VBS photos only) -->
+  {
+    service.gallery.length > 0 && (
+      <section class="section pt-0 md:pt-0" aria-label={`${service.name} by VBS`}>
+        <div class="container-site">
+          <div class:list={['grid gap-6', service.gallery.length > 1 ? 'md:grid-cols-3' : 'md:grid-cols-2']}>
+            {service.gallery.map((photo) => (
+              <figure data-reveal>
+                <div class="overflow-hidden rounded-md bg-line">
+                  <Picture
+                    src={photo.src}
+                    formats={['avif', 'webp']}
+                    fallbackFormat="jpg"
+                    widths={[480, 720, 960]}
+                    sizes={service.gallery.length > 1 ? '(min-width: 768px) 33vw, 100vw' : '(min-width: 768px) 50vw, 100vw'}
+                    alt={photo.alt}
+                    loading="lazy"
+                    class="aspect-4/3 w-full object-cover object-center"
+                  />
+                </div>
+                <figcaption class="mt-2 text-sm text-muted">{photo.stock ? stockNote : photo.caption}</figcaption>
+              </figure>
+            ))}
+            {service.gallery.length === 1 && (
+              <div class="flex flex-col items-start justify-between gap-8 rounded-md border border-line bg-card p-6 sm:p-8" data-reveal>
+                <div>
+                  <p class="text-h3 max-w-[20ch]">See more of our work</p>
+                  <p class="mt-4 max-w-[40ch] text-muted">
+                    Browse recent kitchens, media walls and built-ins, or send us photos of your space for a quote.
+                  </p>
+                </div>
+                <a href="/#projects" class="btn btn-outline">
+                  View projects
+                  <Icon name="arrow-right" size={20} class="btn-arrow" />
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Planning -->
+  <section class="section bg-white" aria-labelledby="planning-title">
+    <div class="container-site">
+      <div class="max-w-2xl" data-reveal>
+        <p class="eyebrow">Planning</p>
+        <h2 id="planning-title" class="text-h2 mt-4">What to think about before you start.</h2>
+      </div>
+      <ul class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+        {
+          service.planning.map((item) => (
+            <li class="border-t-2 border-ink pt-6" data-reveal>
+              <h3 class="text-h4">{item.title}</h3>
+              <p class="mt-2 text-muted">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Pricing (only where a cost guide exists) -->
+  {
+    service.pricing && (
+      <section class="section" aria-labelledby="pricing-title">
+        <div class="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <div class="lg:col-span-5" data-reveal>
+            <p class="eyebrow">Cost</p>
+            <h2 id="pricing-title" class="text-h2 mt-4">Planning price ranges.</h2>
+            <p class="mt-6 max-w-[48ch] text-muted">{service.pricing.note}</p>
+            <a href={service.pricing.guide.href} class="mt-6 inline-flex min-h-11 items-center gap-2 font-semibold hover:text-accent">
+              {service.pricing.guide.label}
+              <Icon name="arrow-right" size={20} />
+            </a>
+          </div>
+          <dl class="border-t border-line lg:col-span-7" data-reveal>
+            {service.pricing.rows.map((row) => (
+              <div class="grid gap-2 border-b border-line py-6 sm:grid-cols-[1fr_auto] sm:gap-8">
+                <dt class="text-h4">{row.label}</dt>
+                <dd class="font-semibold tabular-nums">{row.range}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    )
+  }
+
+  <Process />
+
+  <!-- FAQ -->
+  <section class="section" aria-labelledby="faq-title">
+    <div class="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-4" data-reveal>
+        <p class="eyebrow">Questions</p>
+        <h2 id="faq-title" class="text-h2 mt-4">Common questions.</h2>
+        {
+          service.related && (
+            <a href={service.related.href} class="mt-6 inline-flex min-h-11 items-center gap-2 font-semibold hover:text-accent">
+              {service.related.label}
+              <Icon name="arrow-right" size={20} />
+            </a>
+          )
+        }
+      </div>
+      <div class="border-t border-line lg:col-span-8">
+        {
+          service.faqs.map((faq) => (
+            <details class="faq group border-b border-line" data-reveal>
+              <summary class="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 text-h4">
+                <span>{faq.q}</span>
+                <span class="faq-mark shrink-0 text-warm-dark" aria-hidden="true">+</span>
+              </summary>
+              <p class="max-w-[62ch] pb-6 text-muted">{faq.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Service area + other services -->
+  <section class="section border-t border-line" aria-labelledby="area-title">
+    <div class="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-6" data-reveal>
+        <p class="eyebrow">Service area</p>
+        <h2 id="area-title" class="text-h2 mt-4">{service.name} across Hamilton and the west GTA.</h2>
+        <p class="mt-6 max-w-[48ch] text-muted">
+          We are based in {site.baseCity} and work in the towns below and across the Greater Toronto Area. Nearby but not
+          listed? Get in touch and ask.
+        </p>
+        <ul class="mt-8 flex flex-wrap gap-2" aria-label="Areas we serve">
+          {site.towns.map((town) => <li class="rounded-full border border-line bg-card px-4 py-2 text-sm">{town}</li>)}
+        </ul>
+      </div>
+      <nav class="lg:col-span-6" aria-labelledby="other-services-title" data-reveal>
+        <h3 id="other-services-title" class="eyebrow">Other services</h3>
+        <ul class="mt-4 border-t border-line">
+          {
+            others.map((s) => (
+              <li class="border-b border-line">
+                <a href={`/${s.slug}`} class="flex min-h-14 items-center justify-between gap-4 text-h4 hover:text-accent">
+                  {s.name}
+                  <Icon name="arrow-right" size={20} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <QuoteCta />
+</BaseLayout>
+
+<style>
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-mark {
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: transform var(--dur-fast) var(--ease-out-quint);
+  }
+  .faq[open] .faq-mark {
+    transform: rotate(45deg);
+  }
+</style>

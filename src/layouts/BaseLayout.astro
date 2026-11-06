@@ -6,6 +6,7 @@ import SiteHeader from '@/components/SiteHeader.astro';
 import SiteFooter from '@/components/SiteFooter.astro';
 import MobileActionBar from '@/components/MobileActionBar.astro';
 import { site } from '@/data/site';
+import { services } from '@/data/services';
 
 interface Props {
   title: string;
@@ -40,6 +41,7 @@ const canonical = Astro.props.canonical ?? new URL(canonicalPath, site.url).href
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'HomeAndConstructionBusiness',
+  '@id': `${site.url}/#business`,
   name: site.name,
   legalName: site.legalName,
   url: `${site.url}/`,
@@ -50,7 +52,15 @@ const jsonLd = {
   description: site.description,
   address: { '@type': 'PostalAddress', addressLocality: site.baseCity, addressRegion: 'ON', addressCountry: 'CA' },
   areaServed: site.areas.map((name) => (name === 'GTA' ? 'Greater Toronto Area' : name)),
-  sameAs: [site.instagram.url],
+  sameAs: [site.instagram.url, site.googleProfile],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Custom cabinetry and millwork',
+    itemListElement: services.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.name, url: `${site.url}/${s.slug}` },
+    })),
+  },
 };
 ---
 
